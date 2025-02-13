@@ -102,12 +102,56 @@ npm start
 
 ## デプロイ
 
-1. 本番環境用の環境変数を設定
-2. ビルドを実行
-```bash
-npm run build
-```
-3. `build`ディレクトリの内容をホスティングサービスにデプロイ
+### Vercelを使用したデプロイ手順
+
+1. Vercelアカウントの作成
+   - [Vercel](https://vercel.com)にアクセス
+   - 「Sign Up」をクリック
+   - GitHubアカウントでサインアップを選択
+
+2. プロジェクトのインポート
+   - Vercelダッシュボードで「New Project」をクリック
+   - 「Import Git Repository」セクションでsoulmate-aiリポジトリを選択
+   - 必要に応じて「Import」をクリック
+
+3. プロジェクトの設定
+   - 「Framework Preset」が「Create React App」になっていることを確認
+   - 「Environment Variables」セクションで以下の環境変数を設定：
+     - `REACT_APP_SUPABASE_URL`
+     - `REACT_APP_SUPABASE_ANON_KEY`
+     - `REACT_APP_OPENAI_API_KEY`
+   - 「Deploy」ボタンをクリック
+
+4. デプロイ完了後の設定
+   - 「Domains」タブでカスタムドメインを設定（任意）
+   - 「Settings」→「Privacy」で「Protect Preview URLs」を有効化
+
+5. 特定ユーザーへのアクセス権付与
+   - 「Settings」→「Privacy」→「Add Email」で閲覧を許可するメールアドレスを追加
+   - 追加したユーザーにVercelのプレビューURLを共有
+
+### アクセス制限の管理
+
+1. パスワード保護の設定
+   - 「Settings」→「Privacy」→「Require Password」を有効化
+   - パスワードを設定
+   - パスワードを許可するユーザーに共有
+
+2. アクセス権の管理
+   - 「Team Members」でチームメンバーを追加/削除
+   - 各メンバーの権限レベルを設定（Member/Owner）
+
+### デプロイの更新
+
+- mainブランチへの変更が自動的にデプロイされます
+- デプロイの状況は「Deployments」タブで確認できます
+- 必要に応じて「Redeploy」または「Roll back」が可能
+
+### 注意事項
+
+- 環境変数は適切に管理し、公開リポジトリには含めないでください
+- アクセス権を付与するメールアドレスは慎重に管理してください
+- 定期的にアクセス権限を見直すことをお勧めします
 
 ## トラブルシューティング
 
