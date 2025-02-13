@@ -8,9 +8,11 @@ import {
   Typography,
   Box,
   Paper,
+  IconButton,
 } from '@mui/material';
 import { Theme } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ThemeSelectProps {
   value: string;
@@ -20,6 +22,7 @@ interface ThemeSelectProps {
 export const ThemeSelect: React.FC<ThemeSelectProps> = ({ value, onChange }) => {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
+  const [showDescription, setShowDescription] = useState(true);
 
   useEffect(() => {
     loadThemes();
@@ -29,6 +32,7 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({ value, onChange }) => 
     if (value) {
       const theme = themes.find((t) => t.id === value);
       setSelectedTheme(theme || null);
+      setShowDescription(true);
     } else {
       setSelectedTheme(null);
     }
@@ -82,9 +86,20 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({ value, onChange }) => 
           ))}
         </Select>
       </FormControl>
-      {selectedTheme && (
-        <Paper sx={{ mt: 2, p: 2 }} variant="outlined">
-          {formatDescription(selectedTheme.description)}
+      {selectedTheme && showDescription && (
+        <Paper sx={{ mt: 2, p: 2, position: 'relative' }} variant="outlined">
+          <IconButton
+            size="small"
+            onClick={() => setShowDescription(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+          <Box sx={{ pr: 4 }}>{formatDescription(selectedTheme.description)}</Box>
         </Paper>
       )}
     </Box>

@@ -40,6 +40,10 @@ export const Header: React.FC = () => {
 
       if (error) throw error;
       setProfile(data);
+      
+      if (!data?.username) {
+        setProfileDialogOpen(true);
+      }
     } catch (error) {
       setProfile(null);
     }
@@ -50,13 +54,6 @@ export const Header: React.FC = () => {
       loadProfile();
     }
   }, [user, loadProfile]);
-
-  useEffect(() => {
-    if (user && isFirstLogin && !profile) {
-      setProfileDialogOpen(true);
-      setIsFirstLogin(false);
-    }
-  }, [user, profile, isFirstLogin]);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

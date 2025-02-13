@@ -13,7 +13,7 @@ interface ChatContainerProps {
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachId }) => {
-  const { user } = useAuth();
+  const { user, session, sessionStartTime } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +40,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
   }, [themeId, approachId]);
 
   const loadMessages = useCallback(async () => {
+    if (!session?.access_token || !sessionStartTime) return;
+
     try {
       const { data, error } = await supabase
         .from('messages')
@@ -47,6 +49,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
         .eq('theme_id', themeId)
         .eq('approach_id', approachId)
         .eq('user_id', user?.id)
+        .gte('created_at', sessionStartTime)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -55,14 +58,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       setError('メッセージの読み込みに失敗しました。');
       setMessages([]);
     }
-  }, [themeId, approachId, user?.id]);
+  }, [themeId, approachId, user?.id, session?.access_token, sessionStartTime]);
 
   useEffect(() => {
-    if (user) {
+    if (user && session && sessionStartTime) {
       loadThemeAndApproach();
       loadMessages();
     }
-  }, [user, loadMessages, loadThemeAndApproach]);
+  }, [user, session, sessionStartTime, loadMessages, loadThemeAndApproach]);
 
   useEffect(() => {
     scrollToBottom();
@@ -84,6 +87,14 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
 
       const { error: insertError } = await supabase.from('messages').insert([userMessage]);
       if (insertError) throw insertError;
+
+      const { error: updateError } = await supabase.rpc('increment_prompt_count', {
+        user_id: user.id
+      });
+      
+      if (updateError) {
+        console.error('プロンプトカウントの更新に失敗しました:', updateError);
+      }
 
       const chatHistory = messages.map(({ role, content }) => ({ role, content }));
       const aiResponse = await generateChatResponse(

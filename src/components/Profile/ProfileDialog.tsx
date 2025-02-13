@@ -13,10 +13,12 @@ import {
   Chip,
   Box,
   Alert,
+  Typography,
 } from '@mui/material';
 import { Profile } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { SelectChangeEvent } from '@mui/material/Select';
+import ChatIcon from '@mui/icons-material/Chat';
 
 interface ProfileDialogProps {
   open: boolean;
@@ -179,6 +181,16 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
           </Alert>
         )}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          {profile.prompt_count !== undefined && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Chip
+                icon={<ChatIcon />}
+                label={`総プロンプト数: ${profile.prompt_count.toLocaleString()}回`}
+                color="primary"
+                variant="outlined"
+              />
+            </Box>
+          )}
           <TextField
             label="ユーザー名"
             value={profile.username}

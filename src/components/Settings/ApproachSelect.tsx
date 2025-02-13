@@ -8,9 +8,11 @@ import {
   Typography,
   Box,
   Paper,
+  IconButton,
 } from '@mui/material';
 import { Approach } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ApproachSelectProps {
   value: string;
@@ -20,6 +22,7 @@ interface ApproachSelectProps {
 export const ApproachSelect: React.FC<ApproachSelectProps> = ({ value, onChange }) => {
   const [approaches, setApproaches] = useState<Approach[]>([]);
   const [selectedApproach, setSelectedApproach] = useState<Approach | null>(null);
+  const [showDescription, setShowDescription] = useState(true);
 
   useEffect(() => {
     loadApproaches();
@@ -29,6 +32,7 @@ export const ApproachSelect: React.FC<ApproachSelectProps> = ({ value, onChange 
     if (value) {
       const approach = approaches.find((a) => a.id === value);
       setSelectedApproach(approach || null);
+      setShowDescription(true);
     } else {
       setSelectedApproach(null);
     }
@@ -89,9 +93,20 @@ export const ApproachSelect: React.FC<ApproachSelectProps> = ({ value, onChange 
           ))}
         </Select>
       </FormControl>
-      {selectedApproach && (
-        <Paper sx={{ mt: 2, p: 2 }} variant="outlined">
-          {formatDescription(selectedApproach.description)}
+      {selectedApproach && showDescription && (
+        <Paper sx={{ mt: 2, p: 2, position: 'relative' }} variant="outlined">
+          <IconButton
+            size="small"
+            onClick={() => setShowDescription(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+          <Box sx={{ pr: 4 }}>{formatDescription(selectedApproach.description)}</Box>
         </Paper>
       )}
     </Box>

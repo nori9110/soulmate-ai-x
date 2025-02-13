@@ -30,6 +30,7 @@ export interface Profile {
   occupation: string | null;
   interests: string[];
   bio: string | null;
+  prompt_count: number;
   created_at: string;
   updated_at: string;
 }
