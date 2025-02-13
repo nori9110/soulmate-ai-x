@@ -80,6 +80,7 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
         .maybeSingle();
 
       if (fetchError) {
+        // eslint-disable-next-line no-console
         console.error('Profile fetch error:', fetchError);
         throw fetchError;
       }
@@ -130,9 +131,6 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
         interests: profile.interests || [],
         bio: profile.bio || '',
       };
-
-      // eslint-disable-next-line no-console
-      console.log('Saving profile:', profileData);
 
       const { error: upsertError } = await supabase
         .from('profiles')

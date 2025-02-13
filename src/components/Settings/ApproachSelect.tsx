@@ -56,8 +56,8 @@ export const ApproachSelect: React.FC<ApproachSelectProps> = ({ value, onChange 
           line.startsWith('-')
             ? 'body2'
             : line.startsWith('特徴：') || line.startsWith('例：')
-            ? 'subtitle2'
-            : 'body1'
+              ? 'subtitle2'
+              : 'body1'
         }
         sx={{
           ml: line.startsWith('-') ? 2 : 0,

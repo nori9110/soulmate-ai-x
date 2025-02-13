@@ -41,7 +41,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function App() {
-  const { user, signIn, signUp, signOut, loading } = useAuth();
+  const { user, signIn, signUp, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
