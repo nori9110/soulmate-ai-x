@@ -1,11 +1,11 @@
 export interface Message {
   id: string;
-  created_at: string;
   user_id: string;
   content: string;
   role: 'user' | 'assistant';
   theme_id: string;
   approach_id: string;
+  created_at: string;
 }
 
 export interface Theme {
@@ -20,6 +20,18 @@ export interface Approach {
   name: string;
   description: string;
   created_at: string;
+}
+
+export interface Profile {
+  id: string;
+  username: string;
+  age_group: '10代' | '20代' | '30代' | '40代' | '50代以上' | '未回答';
+  gender: '男性' | '女性' | 'その他' | '未回答';
+  occupation: string | null;
+  interests: string[];
+  bio: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Database {
@@ -39,6 +51,11 @@ export interface Database {
         Row: Approach;
         Insert: Omit<Approach, 'id' | 'created_at'>;
         Update: Partial<Approach>;
+      };
+      profiles: {
+        Row: Profile;
+        Insert: Omit<Profile, 'created_at' | 'updated_at'>;
+        Update: Partial<Profile>;
       };
     };
   };

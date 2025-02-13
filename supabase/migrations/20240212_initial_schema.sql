@@ -41,6 +41,59 @@ CREATE POLICY "全ユーザーに対してアプローチの読み取りを許�
 CREATE POLICY "認証済みユーザーのみメッセージの作成を許可" ON messages FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "メッセージ所有者のみ読み取りを許可" ON messages FOR SELECT USING (auth.uid() = user_id);
 
+-- Create auth.users table
+CREATE TABLE auth.users (
+    id UUID REFERENCES auth.users PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
+
+-- Create policy
+CREATE POLICY "ユーザーは自身のデータのみアクセス可能" ON auth.users
+    FOR ALL USING (auth.uid() = id);
+
+-- Create profiles table
+CREATE TABLE public.profiles (
+    id UUID REFERENCES auth.users PRIMARY KEY,
+    username VARCHAR NOT NULL,
+    age_group VARCHAR CHECK (age_group IN ('10代', '20代', '30代', '40代', '50代以上')) NOT NULL,
+    gender VARCHAR CHECK (gender IN ('男性', '女性', 'その他', '未回答')) NOT NULL,
+    occupation VARCHAR,
+    interests TEXT[],
+    bio TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Enable RLS for profiles
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for profiles
+CREATE POLICY "プロフィールの参照は全ユーザーに許可" ON public.profiles
+    FOR SELECT USING (true);
+CREATE POLICY "プロフィールの更新は本人のみ許可" ON public.profiles
+    FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "プロフィールの作成は本人のみ許可" ON public.profiles
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Create function to handle updated_at
+CREATE OR REPLACE FUNCTION handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = TIMEZONE('utc'::text, NOW());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger for updated_at
+CREATE TRIGGER update_profiles_updated_at
+    BEFORE UPDATE ON public.profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION handle_updated_at();
+
 -- 初期データの投入：テーマ
 INSERT INTO themes (name, description) VALUES
 ('恋愛相談', '恋愛に関する悩みや相談について話し合います'),
