@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Typography,
+  Box,
+  Paper,
+} from '@mui/material';
 import { Theme } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 
@@ -10,10 +19,20 @@ interface ThemeSelectProps {
 
 export const ThemeSelect: React.FC<ThemeSelectProps> = ({ value, onChange }) => {
   const [themes, setThemes] = useState<Theme[]>([]);
+  const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     loadThemes();
   }, []);
+
+  useEffect(() => {
+    if (value) {
+      const theme = themes.find((t) => t.id === value);
+      setSelectedTheme(theme || null);
+    } else {
+      setSelectedTheme(null);
+    }
+  }, [value, themes]);
 
   const loadThemes = async () => {
     try {
@@ -29,22 +48,45 @@ export const ThemeSelect: React.FC<ThemeSelectProps> = ({ value, onChange }) => 
     onChange(event.target.value);
   };
 
-  return (
-    <FormControl fullWidth>
-      <InputLabel id="theme-select-label">テーマ</InputLabel>
-      <Select
-        labelId="theme-select-label"
-        id="theme-select"
-        value={value}
-        label="テーマ"
-        onChange={handleChange}
+  const formatDescription = (description: string) => {
+    return description.split('\n').map((line, index) => (
+      <Typography
+        key={index}
+        variant={line.startsWith('-') ? 'body2' : line.startsWith('例：') ? 'subtitle2' : 'body1'}
+        sx={{
+          ml: line.startsWith('-') ? 2 : 0,
+          mt: line.startsWith('例：') ? 1 : 0,
+          color: line.startsWith('-') ? 'text.secondary' : 'text.primary',
+        }}
       >
-        {themes.map((theme) => (
-          <MenuItem key={theme.id} value={theme.id}>
-            {theme.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+        {line}
+      </Typography>
+    ));
+  };
+
+  return (
+    <Box>
+      <FormControl fullWidth>
+        <InputLabel id="theme-select-label">テーマ</InputLabel>
+        <Select
+          labelId="theme-select-label"
+          id="theme-select"
+          value={value}
+          label="テーマ"
+          onChange={handleChange}
+        >
+          {themes.map((theme) => (
+            <MenuItem key={theme.id} value={theme.id}>
+              {theme.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {selectedTheme && (
+        <Paper sx={{ mt: 2, p: 2 }} variant="outlined">
+          {formatDescription(selectedTheme.description)}
+        </Paper>
+      )}
+    </Box>
   );
 };
