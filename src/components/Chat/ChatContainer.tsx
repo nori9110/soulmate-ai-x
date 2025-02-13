@@ -89,7 +89,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       if (insertError) throw insertError;
 
       const { error: updateError } = await supabase.rpc('increment_prompt_count', {
-        user_id: user.id
+        user_id: user.id,
       });
       
       if (updateError) {
