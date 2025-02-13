@@ -91,7 +91,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       const { error: updateError } = await supabase.rpc('increment_prompt_count', {
         user_id: user.id,
       });
-      
+
       if (updateError) {
         console.error('プロンプトカウントの更新に失敗しました:', updateError);
       }

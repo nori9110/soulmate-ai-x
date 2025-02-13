@@ -40,7 +40,7 @@ export const Header: React.FC = () => {
 
       if (error) throw error;
       setProfile(data);
-      
+
       if (!data?.username) {
         setProfileDialogOpen(true);
       }
