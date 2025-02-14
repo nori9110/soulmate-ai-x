@@ -25,19 +25,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // セッションの初期化
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session) {
-        setSessionStartTime(new Date().toISOString());
+    const initSession = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        if (currentSession) {
+          setSessionStartTime(new Date().toISOString());
+        }
+      } catch (error) {
+        console.error('セッションの初期化に失敗しました:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+
+    initSession();
 
     // セッション状態の監視
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session) {
@@ -52,28 +60,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: REDIRECT_URL,
-      },
-    });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: REDIRECT_URL,
+          data: {
+            timestamp: new Date().toISOString(),
+          },
+        },
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('サインアップエラー:', error);
+      throw error;
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('サインインエラー:', error);
+      throw error;
+    }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    setSessionStartTime(null);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setSessionStartTime(null);
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error('サインアウトエラー:', error);
+      throw error;
+    }
   };
 
   return (
