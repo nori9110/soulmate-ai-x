@@ -13,7 +13,6 @@ import {
   Chip,
   Box,
   Alert,
-  Typography,
 } from '@mui/material';
 import { Profile } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
@@ -97,6 +96,7 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
         setProfile(newProfile);
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Profile load error:', error);
       setProfile(initialProfile);
       setError('プロフィールの読み込みに失敗しました。');

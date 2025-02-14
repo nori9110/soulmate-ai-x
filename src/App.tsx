@@ -44,18 +44,16 @@ function TabPanel(props: TabPanelProps) {
 function App() {
   // 追加: 現在のホストが 'soulmate-ai-ten.vercel.app' でない場合、本番用URLに強制リダイレクト
   useEffect(() => {
-    if (
-      process.env.NODE_ENV === 'production' &&
-      window.location.hostname !== 'soulmate-ai-ten.vercel.app'
-    ) {
+    const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
+
+    if (vercelEnv === 'production' && window.location.hostname !== 'soulmate-ai-ten.vercel.app') {
       // eslint-disable-next-line no-console
       console.warn(
         'Redirecting from',
         window.location.hostname,
         'to https://soulmate-ai-ten.vercel.app'
       );
-      const baseUrl = 'https://soulmate-ai-ten.vercel.app';
-      const newUrl = baseUrl + window.location.pathname + window.location.search;
+      const newUrl = `https://soulmate-ai-ten.vercel.app${window.location.pathname}${window.location.search}`;
       window.location.replace(newUrl);
     }
   }, []);
@@ -74,10 +72,16 @@ function App() {
     const params = new URLSearchParams(window.location.search);
     const error = params.get('error');
     const errorDescription = params.get('error_description');
-    const code = params.get('code');
 
+    // エラーパラメータの処理
     if (error) {
-      setError(errorDescription || '認証エラーが発生しました。');
+      const errorMessage = errorDescription || '認証エラーが発生しました。';
+      setError(errorMessage);
+
+      // エラーの場合、URLからエラーパラメータを削除
+      const cleanPath = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanPath);
+      return;
     }
 
     // セッションの監視
@@ -87,26 +91,15 @@ function App() {
       if (session?.user) {
         // 認証成功時の処理
         setError(null);
-        // 認証成功後、URLパラメータをクリア（少し遅延を入れて確実にセッション処理後に実行）
-        setTimeout(() => {
-          if (window.location.search && (code || error)) {
-            const path = window.location.pathname;
-            window.history.replaceState({}, document.title, path);
-          }
-        }, 500);
+        // 認証成功後、即座にURLパラメータをクリア
+        if (window.location.search) {
+          const path = window.location.pathname;
+          window.history.replaceState({}, document.title, path);
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    // ページマウント後、1.5秒後にURLのクエリパラメータを削除
-    setTimeout(() => {
-      if (window.location.search) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }, 1500);
   }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {

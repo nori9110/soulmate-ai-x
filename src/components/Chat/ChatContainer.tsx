@@ -46,6 +46,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       setError(null);
     } catch (error) {
       setError('テーマとアプローチの読み込みに失敗しました。');
+      // eslint-disable-next-line no-console
       console.error('データ読み込みエラー:', error);
     }
   }, [themeId, approachId, session?.access_token]);
@@ -71,6 +72,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       setError(null);
     } catch (error) {
       setError('メッセージの読み込みに失敗しました。');
+      // eslint-disable-next-line no-console
       console.error('メッセージ読み込みエラー:', error);
       setMessages([]);
     }
@@ -114,6 +116,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       });
 
       if (updateError) {
+        // eslint-disable-next-line no-console
         console.error('プロンプトカウントの更新に失敗しました:', updateError);
       }
 
@@ -138,6 +141,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       await loadMessages();
     } catch (error) {
       setError('メッセージの送信に失敗しました。');
+      // eslint-disable-next-line no-console
       console.error('メッセージ送信エラー:', error);
     } finally {
       setLoading(false);

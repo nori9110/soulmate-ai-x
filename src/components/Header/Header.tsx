@@ -23,7 +23,6 @@ export const Header: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [isFirstLogin, setIsFirstLogin] = useState(true);
 
   const loadProfile = useCallback(async () => {
     if (!user) {

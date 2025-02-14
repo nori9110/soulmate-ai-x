@@ -3,7 +3,23 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
 // 環境に応じたリダイレクトURLを設定
-const getRedirectUrl = () => 'https://soulmate-ai-ten.vercel.app';
+const getRedirectUrl = () => {
+  const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
+  const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
+
+  // 本番環境の場合
+  if (vercelEnv === 'production') {
+    return `https://soulmate-ai-ten.vercel.app`;
+  }
+
+  // プレビュー環境の場合
+  if (vercelEnv === 'preview' && vercelUrl) {
+    return `https://${vercelUrl}`;
+  }
+
+  // 開発環境の場合
+  return `http://${vercelUrl || 'localhost:3000'}`;
+};
 
 interface AuthContextType {
   user: User | null;
@@ -36,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSessionStartTime(new Date().toISOString());
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('セッションの初期化に失敗しました:', error);
       } finally {
         setLoading(false);
@@ -75,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (error) throw error;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('サインアップエラー:', error);
       throw error;
     }
@@ -88,6 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (error) throw error;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('サインインエラー:', error);
       throw error;
     }
@@ -101,6 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setSession(null);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('サインアウトエラー:', error);
       throw error;
     }
