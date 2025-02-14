@@ -61,7 +61,7 @@ function App() {
     const code = params.get('code');
     const error = params.get('error');
     const errorDescription = params.get('error_description');
-    
+
     if (code) {
       // codeパラメータがある場合は認証処理を実行
       window.history.replaceState({}, document.title, BASE_URL);
