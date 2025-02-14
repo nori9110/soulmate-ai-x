@@ -17,6 +17,7 @@ import { ChatContainer } from './components/Chat/ChatContainer';
 import { ThemeSelect } from './components/Settings/ThemeSelect';
 import { ApproachSelect } from './components/Settings/ApproachSelect';
 import { Header } from './components/Header/Header';
+import { supabase } from './lib/supabase';
 
 // 本番環境のURLを設定
 const BASE_URL = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
@@ -58,11 +59,25 @@ function App() {
     // URLからcodeパラメータを取得
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
+    const error = params.get('error');
+    const errorDescription = params.get('error_description');
     
     if (code) {
       // codeパラメータがある場合は認証処理を実行
       window.history.replaceState({}, document.title, BASE_URL);
+    } else if (error) {
+      setError(errorDescription || '認証エラーが発生しました。');
     }
+
+    // セッションの監視
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        // 認証成功時の処理
+        setError(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
