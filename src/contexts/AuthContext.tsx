@@ -7,24 +7,27 @@ const getRedirectUrl = () => {
   // 本番環境のURLを環境変数から取得
   const publicUrl = process.env.REACT_APP_PUBLIC_URL;
   const nodeEnv = process.env.NODE_ENV;
-  const hostname = window.location.hostname;
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
   // デバッグ用ログ出力
+  // eslint-disable-next-line no-console
   console.log('Environment Variables:', {
     NODE_ENV: nodeEnv,
     REACT_APP_PUBLIC_URL: publicUrl,
     hostname,
-    isProduction: nodeEnv === 'production' || hostname === 'soulmate-ai-ten.vercel.app'
+    isProduction: nodeEnv === 'production' || hostname === 'soulmate-ai-ten.vercel.app',
   });
 
   // 本番環境の場合は、設定されたURLを使用
   if (nodeEnv === 'production' || hostname === 'soulmate-ai-ten.vercel.app') {
     const redirectUrl = 'https://soulmate-ai-ten.vercel.app';
+    // eslint-disable-next-line no-console
     console.log('Production redirect URL:', redirectUrl);
     return redirectUrl;
   }
 
   // 開発環境の場合
+  // eslint-disable-next-line no-console
   console.log('Development redirect URL: http://localhost:3000');
   return 'http://localhost:3000';
 };
