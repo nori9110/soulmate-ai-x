@@ -43,6 +43,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
 
       if (themeData) setTheme(themeData);
       if (approachData) setApproach(approachData);
+      setError(null);
     } catch (error) {
       setError('テーマとアプローチの読み込みに失敗しました。');
       console.error('データ読み込みエラー:', error);
@@ -79,6 +80,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
     if (user && session && sessionStartTime) {
       loadThemeAndApproach();
       loadMessages();
+    } else {
+      setError('ログインが必要です。');
     }
   }, [user, session, sessionStartTime, loadMessages, loadThemeAndApproach]);
 
@@ -87,7 +90,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
-    if (!user || !theme || !approach) return;
+    if (!user || !theme || !approach) {
+      setError('セッションが無効です。再度ログインしてください。');
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -132,6 +138,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       await loadMessages();
     } catch (error) {
       setError('メッセージの送信に失敗しました。');
+      console.error('メッセージ送信エラー:', error);
     } finally {
       setLoading(false);
     }
