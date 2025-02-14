@@ -4,21 +4,16 @@ import { supabase } from '../lib/supabase';
 
 // 環境に応じたリダイレクトURLを設定
 const getRedirectUrl = () => {
-  const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
-  const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
-
-  // 本番環境の場合
-  if (vercelEnv === 'production') {
-    return `https://soulmate-ai-ten.vercel.app`;
-  }
-
-  // プレビュー環境の場合
-  if (vercelEnv === 'preview' && vercelUrl) {
-    return `https://${vercelUrl}`;
+  // 本番環境のURLを環境変数から取得
+  const publicUrl = process.env.REACT_APP_PUBLIC_URL;
+  
+  // 本番環境の場合は、設定されたURLを使用
+  if (process.env.NODE_ENV === 'production') {
+    return publicUrl || 'https://soulmate-ai-ten.vercel.app';
   }
 
   // 開発環境の場合
-  return `http://${vercelUrl || 'localhost:3000'}`;
+  return 'http://localhost:3000';
 };
 
 interface AuthContextType {
