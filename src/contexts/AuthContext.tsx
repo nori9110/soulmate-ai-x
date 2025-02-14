@@ -7,17 +7,19 @@ const getRedirectUrl = () => {
   // 本番環境のURLを環境変数から取得
   const publicUrl = process.env.REACT_APP_PUBLIC_URL;
   const nodeEnv = process.env.NODE_ENV;
+  const hostname = window.location.hostname;
 
   // デバッグ用ログ出力
   console.log('Environment Variables:', {
     NODE_ENV: nodeEnv,
     REACT_APP_PUBLIC_URL: publicUrl,
-    isProduction: nodeEnv === 'production'
+    hostname,
+    isProduction: nodeEnv === 'production' || hostname === 'soulmate-ai-ten.vercel.app'
   });
 
   // 本番環境の場合は、設定されたURLを使用
-  if (nodeEnv === 'production') {
-    const redirectUrl = publicUrl || 'https://soulmate-ai-ten.vercel.app';
+  if (nodeEnv === 'production' || hostname === 'soulmate-ai-ten.vercel.app') {
+    const redirectUrl = 'https://soulmate-ai-ten.vercel.app';
     console.log('Production redirect URL:', redirectUrl);
     return redirectUrl;
   }
