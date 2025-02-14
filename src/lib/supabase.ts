@@ -13,7 +13,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: window.localStorage,
     storageKey: 'soulmate-auth',
     debug: process.env.NODE_ENV === 'development',
-    redirectTo: redirectUrl,
   },
   realtime: {
     params: {

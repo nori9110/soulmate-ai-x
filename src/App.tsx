@@ -70,7 +70,9 @@ function App() {
     }
 
     // セッションの監視
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         // 認証成功時の処理
         setError(null);

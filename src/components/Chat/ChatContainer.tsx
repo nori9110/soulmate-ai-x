@@ -32,7 +32,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
     }
 
     try {
-      const [{ data: themeData, error: themeError }, { data: approachData, error: approachError }] = 
+      const [{ data: themeData, error: themeError }, { data: approachData, error: approachError }] =
         await Promise.all([
           supabase.from('themes').select('*').eq('id', themeId).single(),
           supabase.from('approaches').select('*').eq('id', approachId).single(),
