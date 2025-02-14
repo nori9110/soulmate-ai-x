@@ -5,21 +5,17 @@ import { supabase } from '../lib/supabase';
 // 環境に応じたリダイレクトURLを設定
 const getRedirectUrl = () => {
   // 本番環境のURLを環境変数から取得
-  const publicUrl = process.env.REACT_APP_PUBLIC_URL;
   const nodeEnv = process.env.NODE_ENV;
-  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
   // デバッグ用ログ出力
   // eslint-disable-next-line no-console
   console.log('Environment Variables:', {
     NODE_ENV: nodeEnv,
-    REACT_APP_PUBLIC_URL: publicUrl,
-    hostname,
-    isProduction: nodeEnv === 'production' || hostname === 'soulmate-ai-ten.vercel.app',
+    isProduction: nodeEnv === 'production',
   });
 
-  // 本番環境の場合は、設定されたURLを使用
-  if (nodeEnv === 'production' || hostname === 'soulmate-ai-ten.vercel.app') {
+  // 本番環境の場合は、常に本番URLを返す
+  if (nodeEnv === 'production') {
     const redirectUrl = 'https://soulmate-ai-ten.vercel.app';
     // eslint-disable-next-line no-console
     console.log('Production redirect URL:', redirectUrl);
