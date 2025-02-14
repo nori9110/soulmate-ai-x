@@ -19,9 +19,6 @@ import { ApproachSelect } from './components/Settings/ApproachSelect';
 import { Header } from './components/Header/Header';
 import { supabase } from './lib/supabase';
 
-// 本番環境のURLを設定
-const BASE_URL = process.env.REACT_APP_PUBLIC_URL || 'https://soulmate-ai-ten.vercel.app';
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -56,30 +53,42 @@ function App() {
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
-    // URLからcodeパラメータを取得
     const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
     const error = params.get('error');
     const errorDescription = params.get('error_description');
+    const code = params.get('code');
 
-    if (code) {
-      // codeパラメータがある場合は認証処理を実行
-      window.history.replaceState({}, document.title, BASE_URL);
-    } else if (error) {
+    if (error) {
       setError(errorDescription || '認証エラーが発生しました。');
     }
 
     // セッションの監視
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         // 認証成功時の処理
         setError(null);
+        // 認証成功後、URLパラメータをクリア（少し遅延を入れて確実にセッション処理後に実行）
+        setTimeout(() => {
+          if (window.location.search && (code || error)) {
+            const path = window.location.pathname;
+            window.history.replaceState({}, document.title, path);
+          }
+        }, 500);
       }
     });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    // ページマウント後、1.5秒後にURLのクエリパラメータを削除
+    setTimeout(() => {
+      if (window.location.search) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }, 1500);
   }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {

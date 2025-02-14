@@ -2,8 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
-// 本番環境のURLを設定
-const REDIRECT_URL = process.env.REACT_APP_PUBLIC_URL || 'https://soulmate-ai-ten.vercel.app';
+// 環境に応じたリダイレクトURLを設定
+const getRedirectUrl = () => 'https://soulmate-ai-ten.vercel.app';
 
 interface AuthContextType {
   user: User | null;
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
         options: {
-          emailRedirectTo: REDIRECT_URL,
+          emailRedirectTo: getRedirectUrl(),
           data: {
             timestamp: new Date().toISOString(),
           },
