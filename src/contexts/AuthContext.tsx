@@ -6,13 +6,24 @@ import { supabase } from '../lib/supabase';
 const getRedirectUrl = () => {
   // 本番環境のURLを環境変数から取得
   const publicUrl = process.env.REACT_APP_PUBLIC_URL;
+  const nodeEnv = process.env.NODE_ENV;
+
+  // デバッグ用ログ出力
+  console.log('Environment Variables:', {
+    NODE_ENV: nodeEnv,
+    REACT_APP_PUBLIC_URL: publicUrl,
+    isProduction: nodeEnv === 'production'
+  });
 
   // 本番環境の場合は、設定されたURLを使用
-  if (process.env.NODE_ENV === 'production') {
-    return publicUrl || 'https://soulmate-ai-ten.vercel.app';
+  if (nodeEnv === 'production') {
+    const redirectUrl = publicUrl || 'https://soulmate-ai-ten.vercel.app';
+    console.log('Production redirect URL:', redirectUrl);
+    return redirectUrl;
   }
 
   // 開発環境の場合
+  console.log('Development redirect URL: http://localhost:3000');
   return 'http://localhost:3000';
 };
 
