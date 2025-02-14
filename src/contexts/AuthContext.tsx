@@ -2,6 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
+// 本番環境のURLを設定
+const REDIRECT_URL = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -53,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: REDIRECT_URL,
       },
     });
     if (error) throw error;
