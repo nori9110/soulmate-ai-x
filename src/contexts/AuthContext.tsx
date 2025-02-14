@@ -3,7 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
 // 本番環境のURLを設定
-const REDIRECT_URL = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+const REDIRECT_URL = process.env.REACT_APP_PUBLIC_URL || 'https://soulmate-ai-ten.vercel.app';
 
 interface AuthContextType {
   user: User | null;

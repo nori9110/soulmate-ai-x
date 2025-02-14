@@ -20,7 +20,7 @@ import { Header } from './components/Header/Header';
 import { supabase } from './lib/supabase';
 
 // 本番環境のURLを設定
-const BASE_URL = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+const BASE_URL = process.env.REACT_APP_PUBLIC_URL || 'https://soulmate-ai-ten.vercel.app';
 
 interface TabPanelProps {
   children?: React.ReactNode;
