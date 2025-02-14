@@ -42,6 +42,24 @@ function TabPanel(props: TabPanelProps) {
 }
 
 function App() {
+  // 追加: 現在のホストが 'soulmate-ai-ten.vercel.app' でない場合、本番用URLに強制リダイレクト
+  useEffect(() => {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      window.location.hostname !== 'soulmate-ai-ten.vercel.app'
+    ) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Redirecting from',
+        window.location.hostname,
+        'to https://soulmate-ai-ten.vercel.app'
+      );
+      const baseUrl = 'https://soulmate-ai-ten.vercel.app';
+      const newUrl = baseUrl + window.location.pathname + window.location.search;
+      window.location.replace(newUrl);
+    }
+  }, []);
+
   const { user, signIn, signUp, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
