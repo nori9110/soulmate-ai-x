@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 const getRedirectUrl = () => {
   // 本番環境のURLを環境変数から取得
   const publicUrl = process.env.REACT_APP_PUBLIC_URL;
-  
+
   // 本番環境の場合は、設定されたURLを使用
   if (process.env.NODE_ENV === 'production') {
     return publicUrl || 'https://soulmate-ai-ten.vercel.app';
