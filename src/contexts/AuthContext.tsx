@@ -4,22 +4,22 @@ import { supabase } from '../lib/supabase';
 
 // 環境に応じたリダイレクトURLを設定
 const getRedirectUrl = () => {
-  // 本番環境のURLを環境変数から取得
-  const nodeEnv = process.env.NODE_ENV;
-
+  // 現在のURLを取得
+  const currentUrl = window.location.origin;
+  
   // デバッグ用ログ出力
   // eslint-disable-next-line no-console
   console.log('Environment Variables:', {
-    NODE_ENV: nodeEnv,
-    isProduction: nodeEnv === 'production',
+    current_url: currentUrl,
+    NODE_ENV: process.env.NODE_ENV,
+    window_location: window.location.hostname,
   });
 
-  // 本番環境の場合は、常に本番URLを返す
-  if (nodeEnv === 'production') {
-    const redirectUrl = 'https://soulmate-ai-ten.vercel.app';
+  // localhost以外の場合は現在のURLを使用
+  if (!window.location.hostname.includes('localhost')) {
     // eslint-disable-next-line no-console
-    console.log('Production redirect URL:', redirectUrl);
-    return redirectUrl;
+    console.log('Using current URL:', currentUrl);
+    return currentUrl;
   }
 
   // 開発環境の場合
