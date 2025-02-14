@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -17,6 +17,9 @@ import { ChatContainer } from './components/Chat/ChatContainer';
 import { ThemeSelect } from './components/Settings/ThemeSelect';
 import { ApproachSelect } from './components/Settings/ApproachSelect';
 import { Header } from './components/Header/Header';
+
+// 本番環境のURLを設定
+const BASE_URL = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,6 +53,17 @@ function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
+
+  useEffect(() => {
+    // URLからcodeパラメータを取得
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    
+    if (code) {
+      // codeパラメータがある場合は認証処理を実行
+      window.history.replaceState({}, document.title, BASE_URL);
+    }
+  }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
