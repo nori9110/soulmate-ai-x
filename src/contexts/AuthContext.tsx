@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 const getRedirectUrl = () => {
   // 現在のURLを取得
   const currentUrl = window.location.origin;
-  
+
   // デバッグ用ログ出力
   // eslint-disable-next-line no-console
   console.log('Environment Variables:', {
