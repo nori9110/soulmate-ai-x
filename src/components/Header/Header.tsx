@@ -11,6 +11,7 @@ import {
   Button,
   Alert,
   Tooltip,
+  Avatar,
 } from '@mui/material';
 import { AccountCircle, Edit } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
@@ -116,7 +117,11 @@ export const Header: React.FC = () => {
                 color="inherit"
               >
                 <Badge color="error" variant="dot" invisible={!!profile?.username}>
-                  <AccountCircle />
+                  {profile?.avatar_url ? (
+                    <Avatar src={profile.avatar_url} sx={{ width: 32, height: 32 }} />
+                  ) : (
+                    <AccountCircle />
+                  )}
                 </Badge>
               </IconButton>
               <Menu

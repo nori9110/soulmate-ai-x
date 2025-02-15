@@ -18,6 +18,7 @@ import { ThemeSelect } from './components/Settings/ThemeSelect';
 import { ApproachSelect } from './components/Settings/ApproachSelect';
 import { Header } from './components/Header/Header';
 import { supabase } from './lib/supabase';
+import { UpdateNotification } from './components/UpdateNotification';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -321,7 +322,7 @@ function App() {
   }
 
   return (
-    <Box>
+    <>
       <Header />
       <Container maxWidth="lg">
         <Box sx={{ my: 4 }}>
@@ -343,7 +344,8 @@ function App() {
           )}
         </Box>
       </Container>
-    </Box>
+      <UpdateNotification />
+    </>
   );
 }
 

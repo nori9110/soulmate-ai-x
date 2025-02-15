@@ -13,11 +13,15 @@ import {
   Chip,
   Box,
   Alert,
+  Avatar,
+  IconButton,
+  Typography,
 } from '@mui/material';
 import { Profile } from '../../types/database.types';
 import { supabase } from '../../lib/supabase';
 import { SelectChangeEvent } from '@mui/material/Select';
 import ChatIcon from '@mui/icons-material/Chat';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
 interface ProfileDialogProps {
   open: boolean;
@@ -66,6 +70,8 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
   const [profile, setProfile] = useState<Partial<Profile>>(initialProfile);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
     if (!userId) {
@@ -109,6 +115,51 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
     }
   }, [open, loadProfile]);
 
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      if (file.size > 2 * 1024 * 1024) {
+        setError('画像サイズは2MB以下にしてください。');
+        return;
+      }
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const uploadAvatar = async () => {
+    if (!avatarFile || !userId) return null;
+
+    const fileExt = avatarFile.name.split('.').pop();
+    const filePath = `${userId}/avatar.${fileExt}`;
+
+    try {
+      // 古いアバター画像を削除
+      if (profile.avatar_url) {
+        const oldFilePath = profile.avatar_url.split('/').pop();
+        if (oldFilePath) {
+          await supabase.storage.from('avatars').remove([oldFilePath]);
+        }
+      }
+
+      // 新しいアバター画像をアップロード
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, avatarFile, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      // エラーを上位で処理するために再スロー
+      throw error;
+    }
+  };
+
   const handleSave = async () => {
     if (!userId) {
       setError('ユーザーIDが見つかりません。');
@@ -124,6 +175,11 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
     setError(null);
 
     try {
+      let avatarUrl = profile.avatar_url;
+      if (avatarFile) {
+        avatarUrl = await uploadAvatar();
+      }
+
       const profileData = {
         id: userId,
         username: profile.username,
@@ -132,22 +188,18 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
         occupation: profile.occupation || '',
         interests: profile.interests || [],
         bio: profile.bio || '',
+        avatar_url: avatarUrl,
       };
 
       const { error: upsertError } = await supabase
         .from('profiles')
         .upsert(profileData, { onConflict: 'id' });
 
-      if (upsertError) {
-        // eslint-disable-next-line no-console
-        console.error('Profile upsert error:', upsertError);
-        throw upsertError;
-      }
+      if (upsertError) throw upsertError;
 
       await onProfileUpdate();
       onClose();
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('Profile save error:', error);
       setError('プロフィールの保存に失敗しました。もう一度お試しください。');
     } finally {
@@ -181,6 +233,29 @@ export const ProfileDialog: React.FC<ProfileDialogProps> = ({
           </Alert>
         )}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              src={avatarPreview || profile.avatar_url || undefined}
+              sx={{ width: 80, height: 80 }}
+            />
+            <Box>
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="avatar-upload"
+                type="file"
+                onChange={handleAvatarChange}
+              />
+              <label htmlFor="avatar-upload">
+                <IconButton color="primary" aria-label="アバターをアップロード" component="span">
+                  <PhotoCamera />
+                </IconButton>
+              </label>
+              <Typography variant="caption" display="block" color="text.secondary">
+                2MB以下の画像をアップロード
+              </Typography>
+            </Box>
+          </Box>
           {profile.prompt_count !== undefined && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Chip

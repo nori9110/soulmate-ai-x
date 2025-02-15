@@ -204,4 +204,30 @@ AI：「少し違った視点で考えてみましょう。人見知りな性格
 - 共感的な理解の促進
 例：
 あなた：「キャリアチェンジに不安を感じています...」
-AI：「多くの人が同じような不安を乗り越えてきました。例えば、35歳でエンジニアに転身した方は、最初は不安でしたが、小さな目標を一つずつ達成していくことで、3年後には第一線で活躍されています。あなたの場合も、まずは...」'); 
+AI：「多くの人が同じような不安を乗り越えてきました。例えば、35歳でエンジニアに転身した方は、最初は不安でしたが、小さな目標を一つずつ達成していくことで、3年後には第一線で活躍されています。あなたの場合も、まずは...」');
+
+-- プロフィール画像用のストレージバケットを作成
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('avatars', 'avatars', true);
+
+-- ストレージバケットのポリシーを作成
+CREATE POLICY "アバター画像は誰でも参照可能" ON storage.objects
+    FOR SELECT USING (bucket_id = 'avatars');
+
+CREATE POLICY "アバター画像は本人のみアップロード可能" ON storage.objects
+    FOR INSERT WITH CHECK (
+        bucket_id = 'avatars' 
+        AND auth.uid()::text = (storage.foldername(name))[1]
+    );
+
+CREATE POLICY "アバター画像は本人のみ更新可能" ON storage.objects
+    FOR UPDATE USING (
+        bucket_id = 'avatars' 
+        AND auth.uid()::text = (storage.foldername(name))[1]
+    );
+
+CREATE POLICY "アバター画像は本人のみ削除可能" ON storage.objects
+    FOR DELETE USING (
+        bucket_id = 'avatars' 
+        AND auth.uid()::text = (storage.foldername(name))[1]
+    ); 
