@@ -1,58 +1,94 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Box, Paper, CircularProgress, Alert } from '@mui/material';
-import { Message, Theme, Approach } from '../../types/database.types';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { Box, Paper, CircularProgress, Alert, Typography, Chip, Stack } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Message } from '../../types/database.types';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { generateChatResponse } from '../../utils/chat';
 
-interface ChatContainerProps {
-  themeId: string;
-  approachId: string;
+interface LocationState {
+  theme: string;
+  approach: string;
+  themeName: string;
+  approachName: string;
+  themeDescription: string;
+  approachDescription: string;
 }
 
-export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachId }) => {
+// エラーメッセージを統一的に処理するヘルパー関数
+const formatError = (prefix: string, error: unknown): string => {
+  if (error instanceof Error) {
+    return `${prefix}: ${error.message}`;
+  }
+  if (typeof error === 'object' && error !== null) {
+    const supabaseError = error as {
+      message?: string;
+      details?: string;
+      hint?: string;
+      code?: string;
+    };
+    const details = [
+      supabaseError.message,
+      supabaseError.details,
+      supabaseError.hint,
+      supabaseError.code,
+    ]
+      .filter(Boolean)
+      .join(' - ');
+    return `${prefix}: ${details || 'Unknown error'}`;
+  }
+  return `${prefix}: ${String(error)}`;
+};
+
+export const ChatContainer: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const state = location.state as LocationState;
+
+  useEffect(() => {
+    if (!state?.theme || !state?.approach || !state?.themeName || !state?.approachName) {
+      navigate('/theme-selection');
+    }
+  }, [state, navigate]);
+
   const { user, session, sessionStartTime } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<Theme | null>(null);
-  const [approach, setApproach] = useState<Approach | null>(null);
+  const theme = useMemo(() => {
+    if (!state?.theme) return null;
+    return {
+      id: state.theme,
+      name: state.themeName,
+      description: state.themeDescription,
+      created_at: new Date().toISOString(),
+    };
+  }, [state]);
+  const approach = useMemo(() => {
+    if (!state?.approach) return null;
+    return {
+      id: state.approach,
+      name: state.approachName,
+      description: state.approachDescription,
+      created_at: new Date().toISOString(),
+    };
+  }, [state]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const loadThemeAndApproach = useCallback(async () => {
-    if (!session?.access_token) {
-      setError('セッションが無効です。再度ログインしてください。');
-      return;
-    }
-
-    try {
-      const [{ data: themeData, error: themeError }, { data: approachData, error: approachError }] =
-        await Promise.all([
-          supabase.from('themes').select('*').eq('id', themeId).single(),
-          supabase.from('approaches').select('*').eq('id', approachId).single(),
-        ]);
-
-      if (themeError) throw themeError;
-      if (approachError) throw approachError;
-
-      if (themeData) setTheme(themeData);
-      if (approachData) setApproach(approachData);
-      setError(null);
-    } catch (error) {
-      setError('テーマとアプローチの読み込みに失敗しました。');
-      // eslint-disable-next-line no-console
-      console.error('データ読み込みエラー:', error);
-    }
-  }, [themeId, approachId, session?.access_token]);
-
   const loadMessages = useCallback(async () => {
-    if (!session?.access_token || !sessionStartTime || !user?.id) {
+    if (
+      !session?.access_token ||
+      !sessionStartTime ||
+      !user?.id ||
+      !state?.theme ||
+      !state?.approach
+    ) {
       setError('セッションが無効です。再度ログインしてください。');
       return;
     }
@@ -61,8 +97,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       const { data, error } = await supabase
         .from('messages')
         .select('*')
-        .eq('theme_id', themeId)
-        .eq('approach_id', approachId)
+        .eq('theme_id', state.theme)
+        .eq('approach_id', state.approach)
         .eq('user_id', user.id)
         .gte('created_at', sessionStartTime)
         .order('created_at', { ascending: true });
@@ -71,28 +107,25 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       setMessages(data || []);
       setError(null);
     } catch (error) {
-      setError('メッセージの読み込みに失敗しました。');
-      // eslint-disable-next-line no-console
-      console.error('メッセージ読み込みエラー:', error);
       setMessages([]);
+      setError(formatError('メッセージ読み込みエラー', error));
     }
-  }, [themeId, approachId, user?.id, session?.access_token, sessionStartTime]);
+  }, [state?.theme, state?.approach, user?.id, session?.access_token, sessionStartTime]);
 
   useEffect(() => {
     if (user && session && sessionStartTime) {
-      loadThemeAndApproach();
       loadMessages();
     } else {
       setError('ログインが必要です。');
     }
-  }, [user, session, sessionStartTime, loadMessages, loadThemeAndApproach]);
+  }, [user, session, sessionStartTime, loadMessages]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
-    if (!user || !theme || !approach) {
+    if (!user || !theme || !approach || !state?.theme || !state?.approach) {
       setError('セッションが無効です。再度ログインしてください。');
       return;
     }
@@ -104,8 +137,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
         user_id: user.id,
         content,
         role: 'user',
-        theme_id: themeId,
-        approach_id: approachId,
+        theme_id: state.theme,
+        approach_id: state.approach,
       };
 
       const { error: insertError } = await supabase.from('messages').insert([userMessage]);
@@ -116,8 +149,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
       });
 
       if (updateError) {
-        // eslint-disable-next-line no-console
-        console.error('プロンプトカウントの更新に失敗しました:', updateError);
+        setError(formatError('プロンプトカウントの更新に失敗', updateError));
+        return;
       }
 
       const chatHistory = messages.map(({ role, content }) => ({ role, content }));
@@ -131,8 +164,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
         user_id: user.id,
         content: aiResponse,
         role: 'assistant',
-        theme_id: themeId,
-        approach_id: approachId,
+        theme_id: state.theme,
+        approach_id: state.approach,
       };
 
       const { error: assistantError } = await supabase.from('messages').insert([assistantMessage]);
@@ -140,9 +173,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
 
       await loadMessages();
     } catch (error) {
-      setError('メッセージの送信に失敗しました。');
-      // eslint-disable-next-line no-console
-      console.error('メッセージ送信エラー:', error);
+      setError(formatError('メッセージ送信エラー', error));
     } finally {
       setLoading(false);
     }
@@ -158,6 +189,39 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId, approachI
         overflow: 'hidden',
       }}
     >
+      <Box
+        sx={{
+          p: 2,
+          borderBottom: 1,
+          borderColor: 'divider',
+          backgroundColor: 'background.paper',
+        }}
+      >
+        <Stack spacing={2}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Typography variant="subtitle1" color="text.secondary">
+              テーマ：
+            </Typography>
+            <Chip label={theme?.name || '不明なテーマ'} color="primary" variant="outlined" />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+              {theme?.description || ''}
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Typography variant="subtitle1" color="text.secondary">
+              アプローチ：
+            </Typography>
+            <Chip
+              label={approach?.name || '不明なアプローチ'}
+              color="secondary"
+              variant="outlined"
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+              {approach?.description || ''}
+            </Typography>
+          </Stack>
+        </Stack>
+      </Box>
       <Box
         sx={{
           flex: 1,
