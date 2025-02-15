@@ -29,28 +29,34 @@ AIを活用したカウンセリングチャットアプリケーション
 ### セットアップ手順
 
 1. リポジトリのクローン
+
 ```bash
-git clone https://github.com/nori9110/soulmate-ai.git
-cd soulmate-ai
+git clone https://github.com/nori9110/soulmate-ai-x.git
+cd soulmate-ai-x
 ```
 
 2. 依存パッケージのインストール
+
 ```bash
 npm install
 ```
 
 3. 環境変数の設定
+
 - `.env.example`ファイルを`.env`にコピー
+
 ```bash
 cp .env.example .env
 ```
+
 - `.env`ファイルを編集し、必要な環境変数を設定：
   - `REACT_APP_SUPABASE_URL`: SupabaseプロジェクトのURL
   - `REACT_APP_SUPABASE_ANON_KEY`: Supabaseの匿名キー
   - `REACT_APP_OPENAI_API_KEY`: OpenAI APIキー
 
 4. データベースのセットアップ
-Supabase管理画面で以下のSQLを実行：
+   Supabase管理画面で以下のSQLを実行：
+
 ```sql
 -- プロフィールテーブルにprompt_countカラムを追加
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS prompt_count INTEGER DEFAULT 0;
@@ -70,9 +76,11 @@ $$;
 ```
 
 5. アプリケーションの起動
+
 ```bash
 npm start
 ```
+
 アプリケーションは http://localhost:3000 で起動します。
 
 ## 開発ガイドライン
@@ -105,16 +113,19 @@ npm start
 ### Vercelを使用したデプロイ手順
 
 1. Vercelアカウントの作成
+
    - [Vercel](https://vercel.com)にアクセス
    - 「Sign Up」をクリック
    - GitHubアカウントでサインアップを選択
 
 2. プロジェクトのインポート
+
    - Vercelダッシュボードで「New Project」をクリック
-   - 「Import Git Repository」セクションでsoulmate-aiリポジトリを選択
+   - 「Import Git Repository」セクションでsoulmate-ai-xリポジトリを選択
    - 必要に応じて「Import」をクリック
 
 3. プロジェクトの設定
+
    - 「Framework Preset」が「Create React App」になっていることを確認
    - 「Environment Variables」セクションで以下の環境変数を設定：
      - `REACT_APP_SUPABASE_URL`
@@ -123,6 +134,7 @@ npm start
    - 「Deploy」ボタンをクリック
 
 4. デプロイ完了後の設定
+
    - 「Domains」タブでカスタムドメインを設定（任意）
    - 「Settings」→「Privacy」で「Protect Preview URLs」を有効化
 
@@ -133,6 +145,7 @@ npm start
 ### アクセス制限の管理
 
 1. パスワード保護の設定
+
    - 「Settings」→「Privacy」→「Require Password」を有効化
    - パスワードを設定
    - パスワードを許可するユーザーに共有
@@ -158,10 +171,12 @@ npm start
 ### よくある問題
 
 1. 環境変数が認識されない
+
    - `.env`ファイルが正しい場所にあるか確認
    - 環境変数名が`REACT_APP_`で始まっているか確認
 
 2. Supabaseとの接続エラー
+
    - 環境変数が正しく設定されているか確認
    - Supabaseプロジェクトの設定を確認
 
