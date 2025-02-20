@@ -1,12 +1,13 @@
 import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography, Stack } from '@mui/material';
 import { Message } from '../../types/database.types';
 
 interface ChatMessageProps {
   message: Message;
+  username: string;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ message, username }) => {
   const isUser = message.role === 'user';
 
   return (
@@ -26,7 +27,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           borderRadius: 2,
         }}
       >
-        <Typography variant="body1">{message.content}</Typography>
+        <Stack spacing={0.5}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 'bold',
+              color: isUser ? 'inherit' : 'primary.main',
+            }}
+          >
+            {isUser ? username : 'KAGUYA'}
+          </Typography>
+          <Typography variant="body1">{message.content}</Typography>
+        </Stack>
       </Paper>
     </Box>
   );

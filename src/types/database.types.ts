@@ -1,10 +1,11 @@
+import { ReactNode } from 'react';
+
 export interface Message {
   id: string;
   user_id: string;
   content: string;
   role: 'user' | 'assistant';
   theme_id: string;
-  approach_id: string;
   created_at: string;
 }
 
@@ -13,13 +14,7 @@ export interface Theme {
   name: string;
   description: string;
   created_at: string;
-}
-
-export interface Approach {
-  id: string;
-  name: string;
-  description: string;
-  created_at: string;
+  icon?: ReactNode;
 }
 
 export interface Profile {
@@ -46,13 +41,8 @@ export interface Database {
       };
       themes: {
         Row: Theme;
-        Insert: Omit<Theme, 'id' | 'created_at'>;
-        Update: Partial<Theme>;
-      };
-      approaches: {
-        Row: Approach;
-        Insert: Omit<Approach, 'id' | 'created_at'>;
-        Update: Partial<Approach>;
+        Insert: Omit<Theme, 'id' | 'created_at' | 'icon'>;
+        Update: Partial<Omit<Theme, 'icon'>>;
       };
       profiles: {
         Row: Profile;

@@ -1,6 +1,6 @@
 -- Create themes table
 CREATE TABLE themes (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    id VARCHAR PRIMARY KEY,
     name VARCHAR NOT NULL,
     description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
@@ -20,7 +20,7 @@ CREATE TABLE messages (
     user_id UUID NOT NULL,
     content TEXT NOT NULL,
     role VARCHAR NOT NULL CHECK (role IN ('user', 'assistant')),
-    theme_id UUID REFERENCES themes(id),
+    theme_id VARCHAR REFERENCES themes(id),
     approach_id UUID REFERENCES approaches(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );

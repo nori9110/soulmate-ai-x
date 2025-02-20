@@ -2,6 +2,7 @@
   "name": "soulmate-ai",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
@@ -15,9 +16,12 @@
     "@types/node": "^16.18.79",
     "@types/react": "^18.2.51",
     "@types/react-dom": "^18.2.18",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
     "openai": "^4.83.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^7.2.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",
@@ -34,7 +38,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,scss}\"",
-    "serve": "serve -s build"
+    "serve": "serve -s build",
+    "update-themes": "NODE_OPTIONS='--loader ts-node/esm' node --experimental-specifier-resolution=node src/scripts/updateThemes.ts"
   },
   "eslintConfig": {
     "extends": [
@@ -58,6 +63,13 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
-    "prettier": "^3.5.0"
+    "prettier": "^3.5.1",
+    "ts-node": "^10.9.2"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

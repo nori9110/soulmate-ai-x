@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -6,17 +7,14 @@ import {
   Paper,
   TextField,
   Button,
-  Grid,
   CircularProgress,
   Alert,
   Tabs,
   Tab,
 } from '@mui/material';
 import { useAuth } from './contexts/AuthContext';
-import { ChatContainer } from './components/Chat/ChatContainer';
-import { ThemeSelect } from './components/Settings/ThemeSelect';
-import { ApproachSelect } from './components/Settings/ApproachSelect';
-import { Header } from './components/Header/Header';
+import { ThemeSelectionPage } from './pages/ThemeSelectionPage';
+import { ChatPage } from './pages/ChatPage';
 import { supabase } from './lib/supabase';
 import { UpdateNotification } from './components/UpdateNotification';
 
@@ -63,8 +61,6 @@ function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [themeId, setThemeId] = useState('');
-  const [approachId, setApproachId] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
@@ -323,27 +319,11 @@ function App() {
 
   return (
     <>
-      <Header />
-      <Container maxWidth="lg">
-        <Box sx={{ my: 4 }}>
-          <Grid container spacing={2} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={6}>
-              <ThemeSelect value={themeId} onChange={setThemeId} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <ApproachSelect value={approachId} onChange={setApproachId} />
-            </Grid>
-          </Grid>
-
-          {themeId && approachId ? (
-            <ChatContainer themeId={themeId} approachId={approachId} />
-          ) : (
-            <Typography variant="body1" align="center" sx={{ mt: 4 }}>
-              テーマとアプローチを選択してチャットを開始してください。
-            </Typography>
-          )}
-        </Box>
-      </Container>
+      <Routes>
+        <Route path="/" element={<ThemeSelectionPage />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
       <UpdateNotification />
     </>
   );

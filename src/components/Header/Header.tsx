@@ -77,8 +77,51 @@ export const Header: React.FC = () => {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            SoulMate Chat
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              flexGrow: 1,
+              fontFamily: "'Adobe Mining Std', 'Montserrat', sans-serif",
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              letterSpacing: '0.05em',
+              color: '#FFFFFF',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.2)',
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background:
+                  'linear-gradient(45deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+                opacity: 0,
+                transition: 'opacity 0.3s ease',
+                borderRadius: '4px',
+                zIndex: 1,
+              },
+              '&:hover::after': {
+                opacity: 1,
+              },
+              transition: 'all 0.3s ease',
+            }}
+          >
+            <span>soulmate ~</span>
+            <span
+              style={{
+                fontFamily: "'Possion One', cursive",
+                letterSpacing: '0.1em',
+              }}
+            >
+              KAGUYA
+            </span>
+            <span>~ moon vision</span>
           </Typography>
           {user && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
