@@ -86,7 +86,7 @@ export const Header: React.FC = () => {
               gap: '0.5rem',
               flexGrow: 1,
               fontFamily: "'Adobe Mining Std', 'Montserrat', sans-serif",
-              fontSize: '1.5rem',
+              fontSize: '1.2rem',
               fontWeight: 700,
               letterSpacing: '0.05em',
               color: '#FFFFFF',
