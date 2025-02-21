@@ -25,25 +25,37 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, disabled = 
   };
 
   return (
-    <Box sx={{ display: 'flex', gap: 1, p: 2 }}>
+    <Box sx={{ display: 'flex', gap: 1, p: 1 }}>
       <TextField
         fullWidth
         multiline
-        maxRows={4}
+        maxRows={3}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyPress={handleKeyPress}
         disabled={disabled}
         placeholder="メッセージを入力してください..."
-        sx={{ backgroundColor: 'background.paper' }}
+        sx={{
+          backgroundColor: 'background.paper',
+          '& .MuiInputBase-root': {
+            fontSize: '0.75rem',
+            padding: '4px 8px',
+          },
+          '& .MuiOutlinedInput-root': {
+            minHeight: '36px',
+          },
+        }}
       />
       <IconButton
         color="primary"
         onClick={handleSend}
         disabled={!message.trim() || disabled}
-        sx={{ alignSelf: 'flex-end' }}
+        sx={{
+          alignSelf: 'flex-end',
+          padding: '4px',
+        }}
       >
-        <SendIcon />
+        <SendIcon sx={{ fontSize: '1.2rem' }} />
       </IconButton>
     </Box>
   );
