@@ -124,10 +124,15 @@ export const LoginPage: React.FC = () => {
         backgroundRepeat: 'no-repeat',
         backgroundColor: '#000000',
         position: 'relative',
-      }}
-    >
-      <Box
-        sx={{
+        width: '100%',
+        margin: 0,
+        padding: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        '&::before': {
+          content: '""',
           position: 'absolute',
           top: 0,
           left: 0,
@@ -136,10 +141,21 @@ export const LoginPage: React.FC = () => {
           background:
             'linear-gradient(to right, rgba(0,0,0,0.3), rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.95))',
           pointerEvents: 'none',
+        },
+      }}
+    >
+      <Container
+        maxWidth="sm"
+        sx={{
+          position: 'relative',
+          zIndex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
-      />
-      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
-        <Box sx={{ my: 4 }}>
+      >
+        <Box sx={{ width: '100%', mb: 4 }}>
           <Typography
             variant="h4"
             component="h1"
@@ -148,6 +164,7 @@ export const LoginPage: React.FC = () => {
             sx={{
               color: 'white',
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+              mb: 4,
             }}
           >
             SoulMate Chat
@@ -155,8 +172,7 @@ export const LoginPage: React.FC = () => {
           <Paper
             sx={{
               p: 3,
-              background:
-                'linear-gradient(135deg, rgba(107, 70, 193, 0.1), rgba(49, 130, 206, 0.1))',
+              background: '#ffffff',
               border: '1px solid rgba(107, 70, 193, 0.2)',
               borderRadius: 2,
               backdropFilter: 'blur(10px)',
@@ -170,18 +186,21 @@ export const LoginPage: React.FC = () => {
                 aria-label="auth tabs"
                 sx={{
                   '& .MuiTab-root': {
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'rgba(0, 0, 0, 0.7)',
                     fontSize: '1.1rem',
                     fontWeight: 500,
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                    textShadow: 'none',
                     '&.Mui-selected': {
-                      color: '#ffffff',
+                      color: '#1976d2',
+                    },
+                    '&:hover': {
+                      color: '#1976d2',
                     },
                   },
                   '& .MuiTabs-indicator': {
-                    backgroundColor: '#ffffff',
+                    backgroundColor: '#1976d2',
                     height: 3,
-                    boxShadow: '0 0 8px rgba(255,255,255,0.5)',
+                    boxShadow: '0 0 8px rgba(25, 118, 210, 0.5)',
                   },
                 }}
               >
@@ -189,8 +208,8 @@ export const LoginPage: React.FC = () => {
                   label="ログイン"
                   sx={{
                     '&:hover': {
-                      color: '#ffffff',
-                      textShadow: '2px 2px 8px rgba(255,255,255,0.5)',
+                      color: '#1976d2',
+                      textShadow: 'none',
                     },
                   }}
                 />
@@ -198,8 +217,8 @@ export const LoginPage: React.FC = () => {
                   label="新規登録"
                   sx={{
                     '&:hover': {
-                      color: '#ffffff',
-                      textShadow: '2px 2px 8px rgba(255,255,255,0.5)',
+                      color: '#1976d2',
+                      textShadow: 'none',
                     },
                   }}
                 />
