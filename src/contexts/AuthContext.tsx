@@ -122,12 +122,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        throw new Error(`ログアウトに失敗しました: ${error.message}`);
+      }
+
+      // セッション情報のクリア
       setSessionStartTime(null);
       setUser(null);
       setSession(null);
+
+      // ローカルストレージのクリア
+      localStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('sb-access-token');
+      localStorage.removeItem('sb-refresh-token');
+
+      // Supabaseに関連する他のローカルストレージアイテムをクリア
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('sb-') || key.includes('supabase')) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // セッションが正しくクリアされたか確認
+      const {
+        data: { session: currentSession },
+      } = await supabase.auth.getSession();
+      if (currentSession) {
+        throw new Error('セッションのクリアに失敗しました');
+      }
+
+      // メモリ内のキャッシュをクリア
+      await supabase.auth.refreshSession();
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('サインアウトエラー:', error);
       throw error;
     }

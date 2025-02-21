@@ -12,20 +12,24 @@ import {
   Alert,
   Tooltip,
   Avatar,
+  Snackbar,
 } from '@mui/material';
 import { AccountCircle, Edit } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { ProfileDialog } from '../Profile/ProfileDialog';
 import { supabase } from '../../lib/supabase';
 import { Profile } from '../../types/database.types';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // パスに基づいて背景色を決定
   const isTransparent =
@@ -74,9 +78,24 @@ export const Header: React.FC = () => {
     setProfileDialogOpen(true);
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     handleClose();
-    signOut();
+    setLoading(true);
+    setError(null);
+    try {
+      await signOut();
+      // 全ての状態をリセット
+      setProfile(null);
+      setProfileDialogOpen(false);
+      setAnchorEl(null);
+      // ログインページにリダイレクト
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError('ログアウトに失敗しました。もう一度お試しください。');
+      console.error('ログアウトエラー:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -173,26 +192,6 @@ export const Header: React.FC = () => {
                   )}
                 </Badge>
               </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleProfileClick}>
-                  {profile?.username ? 'プロフィールを編集' : 'プロフィールを設定'}
-                </MenuItem>
-                <MenuItem onClick={handleSignOut}>ログアウト</MenuItem>
-              </Menu>
             </Box>
           )}
         </Toolbar>
@@ -228,6 +227,34 @@ export const Header: React.FC = () => {
         onProfileUpdate={loadProfile}
         isEdit={!!profile?.username}
       />
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+        message={error}
+      />
+      <Menu
+        id="menu-appbar"
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={handleProfileClick}>
+          {profile?.username ? 'プロフィールを編集' : 'プロフィールを設定'}
+        </MenuItem>
+        <MenuItem onClick={handleSignOut} disabled={loading}>
+          {loading ? 'ログアウト中...' : 'ログアウト'}
+        </MenuItem>
+      </Menu>
     </>
   );
 };
