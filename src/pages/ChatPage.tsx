@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Container, Paper, Typography, Button } from '@mui/material';
+import { Box, Container, Paper, Typography, Button, Stack, Chip } from '@mui/material';
 import { useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { ChatContainer } from '../components/Chat/ChatContainer';
 import { Header } from '../components/Header/Header';
@@ -29,15 +29,42 @@ export const ChatPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        background: `url('/images/kaguyahime.png')`,
+        backgroundPosition: 'bottom left',
+        backgroundSize: 'auto 80vh',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#000000',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background:
+            'linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.95) 100%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        },
+      }}
+    >
       <Header />
       <Container
-        maxWidth="lg"
+        maxWidth="md"
         sx={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           py: 2,
+          position: 'relative',
+          zIndex: 1,
+          maxWidth: '800px !important',
         }}
       >
         <Box
@@ -52,9 +79,9 @@ export const ChatPage: React.FC = () => {
             startIcon={<ArrowBackIcon />}
             onClick={handleBackToThemes}
             sx={{
-              color: 'text.secondary',
+              color: '#ffffff',
               '&:hover': {
-                backgroundColor: 'rgba(107, 70, 193, 0.04)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
               },
             }}
           >
@@ -64,9 +91,9 @@ export const ChatPage: React.FC = () => {
             startIcon={<HistoryIcon />}
             onClick={() => setHistoryDialogOpen(true)}
             sx={{
-              color: 'text.secondary',
+              color: '#ffffff',
               '&:hover': {
-                backgroundColor: 'rgba(107, 70, 193, 0.04)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
               },
             }}
           >
@@ -76,50 +103,15 @@ export const ChatPage: React.FC = () => {
 
         <Paper
           sx={{
-            p: 2,
-            mb: 2,
-            background:
-              'linear-gradient(135deg, rgba(107, 70, 193, 0.05), rgba(49, 130, 206, 0.05))',
-            border: '1px solid rgba(107, 70, 193, 0.1)',
-            borderRadius: 2,
-          }}
-        >
-          <Typography
-            variant="h5"
-            align="center"
-            sx={{
-              fontFamily: "'Zen Maru Gothic', serif",
-              fontWeight: 500,
-              color: 'primary.main',
-              mb: 1,
-            }}
-          >
-            {state.themeName}
-          </Typography>
-          <Typography
-            variant="body1"
-            align="center"
-            sx={{
-              fontFamily: "'Zen Maru Gothic', serif",
-              lineHeight: 1.8,
-              color: 'text.secondary',
-              fontSize: '0.9rem',
-            }}
-          >
-            {state.themeDescription}
-          </Typography>
-        </Paper>
-
-        <Paper
-          sx={{
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            background:
-              'linear-gradient(135deg, rgba(107, 70, 193, 0.05), rgba(49, 130, 206, 0.05))',
-            border: '1px solid rgba(107, 70, 193, 0.1)',
+            background: 'rgba(255, 182, 193, 0.2)',
+            border: '1px solid rgba(255, 182, 193, 0.4)',
             borderRadius: 2,
             overflow: 'hidden',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 0 10px rgba(255, 182, 193, 0.1)',
           }}
         >
           <ChatContainer themeId={state.theme} />

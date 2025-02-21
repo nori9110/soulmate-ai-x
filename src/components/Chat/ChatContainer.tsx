@@ -77,7 +77,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId }) => {
   };
 
   const loadMessages = useCallback(async () => {
-    if (!session?.access_token || !sessionStartTime || !user?.id || !themeId) {
+    if (!session?.access_token || !user?.id || !themeId) {
       setError('セッションが無効です。再度ログインしてください。');
       return;
     }
@@ -88,7 +88,6 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId }) => {
         .select('*')
         .eq('theme_id', themeId)
         .eq('user_id', user.id)
-        .gte('created_at', sessionStartTime)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -98,7 +97,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId }) => {
       setMessages([]);
       setError(formatError('メッセージ読み込みエラー', error));
     }
-  }, [themeId, user?.id, session?.access_token, sessionStartTime]);
+  }, [themeId, user?.id, session?.access_token]);
 
   const loadProfile = useCallback(async () => {
     if (!user) return;
@@ -118,12 +117,12 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId }) => {
   }, [user]);
 
   useEffect(() => {
-    if (user && session && sessionStartTime) {
+    if (user && session) {
       loadMessages();
     } else {
       setError('ログインが必要です。');
     }
-  }, [user, session, sessionStartTime, loadMessages]);
+  }, [user, session, loadMessages]);
 
   useEffect(() => {
     if (user) {
@@ -195,69 +194,100 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({ themeId }) => {
   };
 
   return (
-    <Paper
-      elevation={3}
-      sx={{
-        height: '70vh',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
-    >
+    <Box sx={{ position: 'relative' }}>
       <Box
         sx={{
-          p: 2,
-          borderBottom: 1,
-          borderColor: 'divider',
-          backgroundColor: 'background.paper',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '240px', // 600pxの40%
+          background: '#ffffff',
+          zIndex: -1,
         }}
-      >
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Typography variant="subtitle1" color="text.secondary">
-            テーマ：
-          </Typography>
-          <Chip label={theme?.name || '不明なテーマ'} color="primary" variant="outlined" />
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-            {theme?.description || ''}
-          </Typography>
-        </Stack>
-      </Box>
-      <ChatInput onSendMessage={handleSendMessage} disabled={loading} />
-      <Box
+      />
+      <Paper
+        elevation={3}
         sx={{
-          flex: 1,
-          overflow: 'auto',
-          p: 2,
+          height: '860px',
           display: 'flex',
           flexDirection: 'column',
+          overflow: 'hidden',
         }}
       >
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {messages.map((message) => (
-          <ChatMessage
-            key={message.id}
-            message={message}
-            username={profile?.username || 'ゲスト'}
-          />
-        ))}
-        <div ref={messagesEndRef} />
-      </Box>
-      {loading && (
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            p: 2,
+            borderBottom: 1,
+            borderColor: 'rgba(0, 0, 0, 0.1)',
+            background: '#ffffff',
           }}
         >
-          <CircularProgress />
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Chip
+              label={theme?.name || '不明なテーマ'}
+              color="primary"
+              variant="outlined"
+              sx={{
+                borderColor: 'rgba(0, 0, 0, 0.23)',
+                color: '#333333',
+                backgroundColor: 'transparent',
+                '& .MuiChip-label': {
+                  fontWeight: 600,
+                  letterSpacing: '0.02em',
+                },
+              }}
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                ml: 2,
+                color: '#666666',
+                fontWeight: 500,
+                fontSize: '0.95rem',
+              }}
+            >
+              {theme?.description || ''}
+            </Typography>
+          </Stack>
         </Box>
-      )}
-    </Paper>
+        <ChatInput onSendMessage={handleSendMessage} disabled={loading} />
+        <Box
+          sx={{
+            flex: 1,
+            overflow: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            p: 2,
+          }}
+        >
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message}
+              username={profile?.username || 'ゲスト'}
+            />
+          ))}
+          <div ref={messagesEndRef} />
+        </Box>
+        {loading && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        )}
+      </Paper>
+    </Box>
   );
 };

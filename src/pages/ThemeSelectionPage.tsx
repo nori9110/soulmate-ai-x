@@ -23,20 +23,49 @@ export const ThemeSelectionPage: React.FC = () => {
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: `url('/images/kaguyahime.png')`,
+        backgroundPosition: 'bottom left',
+        backgroundSize: 'auto 80vh',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#000000',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background:
+            'linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.95) 100%)',
+          pointerEvents: 'none',
+        },
+      }}
+    >
       <Header />
-      <Container maxWidth="sm">
+      <Container
+        maxWidth="sm"
+        sx={{
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
         <Box sx={{ my: 4 }}>
           <Paper
             sx={{
               p: 3,
               mb: 10,
               background:
-                'linear-gradient(135deg, rgba(107, 70, 193, 0.05), rgba(49, 130, 206, 0.05))',
-              border: '1px solid rgba(107, 70, 193, 0.1)',
+                'linear-gradient(135deg, rgba(107, 70, 193, 0.1), rgba(49, 130, 206, 0.1))',
+              border: '1px solid rgba(107, 70, 193, 0.2)',
               borderRadius: 2,
               maxWidth: '600px',
               margin: '0 auto',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
             }}
           >
             <Typography
@@ -45,9 +74,10 @@ export const ThemeSelectionPage: React.FC = () => {
                 fontFamily: "'Zen Old Mincho', serif",
                 fontSize: '1.4rem',
                 lineHeight: 1.8,
-                color: '#1976d2',
+                color: '#ffffff',
                 mb: 2,
                 fontWeight: 500,
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
               }}
             >
               スターシード〜ライトワーカー癒しのお手伝い
@@ -58,7 +88,8 @@ export const ThemeSelectionPage: React.FC = () => {
                 fontFamily: "'Zen Kaku Gothic New', sans-serif",
                 fontSize: '1rem',
                 lineHeight: 1.8,
-                color: 'text.secondary',
+                color: '#ffffff',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
               }}
             >
               光の道標、自分の波動を整え、周囲を落ち着かせる力を
@@ -93,17 +124,19 @@ export const ThemeSelectionPage: React.FC = () => {
             sx={{
               p: 0.75,
               background:
-                'linear-gradient(135deg, rgba(107, 70, 193, 0.05), rgba(49, 130, 206, 0.05))',
-              border: '1px solid rgba(107, 70, 193, 0.1)',
+                'linear-gradient(135deg, rgba(107, 70, 193, 0.1), rgba(49, 130, 206, 0.1))',
+              border: '1px solid rgba(107, 70, 193, 0.2)',
               borderRadius: 2,
               maxWidth: '600px',
               margin: '0 auto',
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
             }}
           >
             <ThemeGrid themes={themes} selectedTheme="" onThemeSelect={handleThemeSelect} />
           </Paper>
         </Box>
       </Container>
-    </>
+    </Box>
   );
 };

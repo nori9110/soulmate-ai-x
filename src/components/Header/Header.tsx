@@ -18,12 +18,18 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ProfileDialog } from '../Profile/ProfileDialog';
 import { supabase } from '../../lib/supabase';
 import { Profile } from '../../types/database.types';
+import { useLocation } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const { user, signOut } = useAuth();
+  const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+
+  // パスに基づいて背景色を決定
+  const isTransparent =
+    !location.pathname.includes('/chat') && !location.pathname.includes('/theme-selection');
 
   const loadProfile = useCallback(async () => {
     if (!user) {
