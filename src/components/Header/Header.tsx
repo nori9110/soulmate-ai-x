@@ -83,13 +83,15 @@ export const Header: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      await signOut();
-      // 全ての状態をリセット
-      setProfile(null);
-      setProfileDialogOpen(false);
-      setAnchorEl(null);
-      // ログインページにリダイレクト
-      navigate('/', { replace: true });
+      const success = await signOut();
+      if (success) {
+        // 全ての状態をリセット
+        setProfile(null);
+        setProfileDialogOpen(false);
+        setAnchorEl(null);
+        // ログインページにリダイレクト
+        navigate('/', { replace: true });
+      }
     } catch (err) {
       setError('ログアウトに失敗しました。もう一度お試しください。');
       console.error('ログアウトエラー:', err);

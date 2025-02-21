@@ -35,7 +35,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -121,38 +121,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      // まずSupabaseのセッションをクリア
       const { error } = await supabase.auth.signOut();
       if (error) {
         throw new Error(`ログアウトに失敗しました: ${error.message}`);
       }
 
-      // セッション情報のクリア
-      setSessionStartTime(null);
-      setUser(null);
-      setSession(null);
-
       // ローカルストレージのクリア
-      localStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('sb-access-token');
-      localStorage.removeItem('sb-refresh-token');
-
-      // Supabaseに関連する他のローカルストレージアイテムをクリア
       Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('sb-') || key.includes('supabase')) {
           localStorage.removeItem(key);
         }
       });
 
+      // セッション情報のクリア
+      setUser(null);
+      setSession(null);
+      setSessionStartTime(null);
+
       // セッションが正しくクリアされたか確認
       const {
         data: { session: currentSession },
       } = await supabase.auth.getSession();
+
       if (currentSession) {
         throw new Error('セッションのクリアに失敗しました');
       }
 
-      // メモリ内のキャッシュをクリア
+      // 最後にキャッシュをクリア
       await supabase.auth.refreshSession();
+
+      return true;
     } catch (error) {
       console.error('サインアウトエラー:', error);
       throw error;
